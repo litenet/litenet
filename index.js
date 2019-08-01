@@ -6,7 +6,7 @@ var port = process.env.PORT || 3000;
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb+srv://vbkellis:my1password@firstcluster-5wdsw.mongodb.net/test?retryWrites=true&w=majority";
 
-var roomSize = 0;
+var nameList = [];
 
 app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
@@ -68,29 +68,19 @@ io.on('connection', function(socket){
 					socket.emit('login fail');			
 				}
 				else {
-					socket.emit('login success');
+					nameList.push(loginData.name);
+					socket.emit('login success', nameList);
 					socket.join('logged in');
 					socket.username = loginData.name;
-					roomSize = io.sockets.adapter.rooms['logged in'].length;
-					io.to('logged in').emit('is_online', '<i>' + socket.username + ' joined the chat. ' + roomSize + ' users are logged in.</i>');
+					socket.broadcast.to('logged in').emit('is_online', loginData.name);
 				}
 			});
 		});
 	});
   
-	socket.on('disconnect', function(){
-		if (socket.username != '')
-		{
-			io.to('logged in').emit('is_online', '<i>' + socket.username + ' left the chat. ' + (roomSize - 1) + ' users are logged in.</i>');
-			io.to('logged in').emit('recipient dropped', socket.username);
-		}
-		
-	});
-	
 	socket.on('chat message', function(msg){
 		io.to(socket.id).emit('chat message', "<b>" + socket.username + "</b>" + ': ' + msg);
 	});
-	
 	
 	socket.on('add recipient', function(candidate){
 		for (x in io.sockets.sockets)
@@ -112,6 +102,24 @@ io.on('connection', function(socket){
 				socket.emit('recipient dropped', candidate);
 			}
 		}
+	});
+	
+	socket.on('disconnect', function(){
+		if (socket.username != '')
+		{
+			io.to('logged in').emit('is_offline', socket.username);
+			io.to('logged in').emit('recipient dropped', socket.username);
+			
+			for(i = 0; i < nameList.length; i++)
+			{
+				if (nameList[i] == socket.username)
+				{
+					nameList.splice(i, 1);
+					i--;
+				}
+			}
+		}
+		
 	});
 });
 

@@ -22,6 +22,13 @@
 		</form> 
 		<br><hr>
 	</div>
+	
+	
+    <div id="onlinepanel">
+		<h2> Online: </h2>
+		<ul id="chatlist"></ul>
+		<br><hr>
+	</div>
   
     <div id="login">
 		<h2> Login: </h2>  
@@ -43,6 +50,7 @@
 			<input id="m" autocomplete="off" /><button>Send</button>
 		</form>
 		
+		<br><b>Recipients:</b>
 		<ul id="recipients"></ul>
 		
 		<form id="addrecipient" action="">
@@ -62,7 +70,10 @@
     <script>
 		var x = document.getElementById("chatInterface");
 		x.style.display = "none";
+		var x = document.getElementById("onlinepanel");
+		x.style.display = "none";
 		var recipientList = [];
+		var chatList = [];
       
         var socket = io();
 		
@@ -124,7 +135,7 @@
 			x.innerHTML = "User added!";
         });
 		
-		socket.on('login fail', function(){
+		socket.on('login fail', function(nameList){
 			var x = document.getElementById("message");
 			x.innerHTML = "Invalid username or password.";
         });
@@ -134,15 +145,27 @@
 			x.innerHTML = "You are logged in in another tab.";
         });
 		
-        socket.on('login success', function(){
+        socket.on('login success', function(nameList){		
+			$('#messages').append($('<li>').html('<i>' + nameList[nameList.length - 1] + ' (you) logged on.</i>'));
+			
 			var x = document.getElementById("message");
 			x.innerHTML = "Login success! Start chatting!";
 			
 			var x = document.getElementById("login");
 			x.style.display = "none";
+			var x = document.getElementById("register");
+			x.style.display = "none";
 			
+			var x = document.getElementById("onlinepanel");
+			x.style.display = "inline";
 			var x = document.getElementById("chatInterface");
 			x.style.display = "inline";
+			
+			for(i = 0; i < nameList.length; i++)
+			{
+				$('#chatlist').append($('<li>').html(nameList[i]));
+				chatList.push(nameList[i]);
+			}
         });
 		
         socket.on('chat message', function(msg){
@@ -191,7 +214,25 @@
         });
 		
 		socket.on('is_online', function(loginName) {
-			$('#messages').append($('<li>').html(loginName));
+			$('#messages').append($('<li>').html('<i>' + loginName + ' logged on.</i>'));
+			chatList.push(loginName);
+			$('#chatlist').append($('<li>').html(loginName));
+        });
+		
+		
+		socket.on('is_offline', function(loginName) {
+			$('#messages').append($('<li>').html('<i>' + loginName + ' logged off.</i>'));
+			$('#chatlist').empty();
+			for(i = 0; i < chatList.length; i++)
+			{
+				if (chatList[i] != loginName)
+					$('#chatlist').append($('<li>').html(chatList[i]));
+				else
+				{
+					chatList.splice(i, 1);
+					i--;
+				}
+			}
         });
 		
     </script>

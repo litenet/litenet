@@ -51,6 +51,16 @@ io.on('connection', function(socket){
 		MongoClient.connect(url, function(err, db) {
 			if (err) throw err;
 			var dbo = db.db("mydb");
+			
+			
+			for (x in io.sockets.sockets)
+			{
+				if (io.sockets.connected[x].username == loginData.name)
+				{
+					socket.emit('login already');
+					return false;
+				}
+			}
 	  
 			dbo.collection("users").find(loginData).toArray(function(err, result) {
 				if (err) throw err;
@@ -70,11 +80,38 @@ io.on('connection', function(socket){
   
 	socket.on('disconnect', function(){
 		if (socket.username != '')
+		{
 			io.to('logged in').emit('is_online', '<i>' + socket.username + ' left the chat. ' + (roomSize - 1) + ' users are logged in.</i>');
+			io.to('logged in').emit('recipient dropped', socket.username);
+		}
+		
 	});
 	
 	socket.on('chat message', function(msg){
-		io.to('logged in').emit('chat message', "<b>" + socket.username + "</b>" + ': ' + msg);
+		io.to(socket.id).emit('chat message', "<b>" + socket.username + "</b>" + ': ' + msg);
+	});
+	
+	
+	socket.on('add recipient', function(candidate){
+		for (x in io.sockets.sockets)
+		{
+			if (io.sockets.connected[x].username == candidate && socket.username != candidate)
+			{
+				io.sockets.connected[x].join(socket.id);
+				socket.emit('recipient added', candidate);
+			}
+		}
+	});
+	
+	socket.on('drop recipient', function(candidate){
+		for (x in io.sockets.sockets)
+		{
+			if (io.sockets.connected[x].username == candidate && socket.username != candidate)
+			{
+				io.sockets.connected[x].leave(socket.id);
+				socket.emit('recipient dropped', candidate);
+			}
+		}
 	});
 });
 

@@ -13,10 +13,10 @@
 		<h2> Register: </h2>
 		<form action=".">
 			Name:<br>
-			<input id="name" "type="text" name="name" value="Alice">
+			<input id="name" "type="text" name="name">
 			<br>
 			Password:<br>
-			<input id="password" type="text" name="password" value="alicepass">
+			<input id="password" type="text" name="password">
 			<br><br>
 			<input type="submit" value="Submit">
 		</form> 
@@ -38,9 +38,23 @@
   
 	<div id="chatInterface">
 		<ul id="messages"></ul>
+		
 		<form id="chatbox" action="">
 			<input id="m" autocomplete="off" /><button>Send</button>
 		</form>
+		
+		
+		<ul id="recipients"></ul>
+		
+		<form id="addrecipient" action="">
+			<input id="addR" autocomplete="off" /><button>Add Recipient</button>
+		</form>
+		
+		
+		<form id="droprecipient" action="">
+			<input id="dropR" autocomplete="off" /><button>Drop Recipient</button>
+		</form>
+
 	</div>
 	
 	
@@ -51,6 +65,7 @@
     <script>
 		var x = document.getElementById("chatInterface");
 		x.style.display = "none";
+		var recipientList = [];
       
         var socket = io();
 		
@@ -61,9 +76,26 @@
 			return false;
         });
 		
+        $('#addrecipient').submit(function(e){
+			e.preventDefault(); // prevents page reloading
+			socket.emit('add recipient', $('#addR').val());
+			$('#addR').val('');
+			return false;
+        });
+		
+		
+		
+        $('#droprecipient').submit(function(e){
+			e.preventDefault(); // prevents page reloading
+			socket.emit('drop recipient', $('#dropR').val());
+			$('#dropR').val('');
+			return false;
+        });
+		
+		
         $('#register').submit(function(e){
 			e.preventDefault(); // prevents page reloading
-			socket.emit('register', { name: $('#name').val(), password: $('#password').val() });
+			socket.emit('register', { name: $('#name').val(), password: $('#password').val(), login: "false"  });
 			$('#password').val('');
 			$('#name').val('');
 			return false;
@@ -71,9 +103,11 @@
 		
         $('#login').submit(function(e){
 			e.preventDefault(); // prevents page reloading
-			socket.emit('login', { name: $('#loginName').val(), password: $('#loginPassword').val() });
+			socket.emit('login', { name: $('#loginName').val(), password: $('#loginPassword').val(), login: "false" });
 			$('#loginPassword').val('');
 			$('#loginName').val('');
+			var x = document.getElementById("message");
+			x.innerHTML = "Logging in...";
 			return false;
         });
 		
@@ -98,6 +132,12 @@
 			x.innerHTML = "Invalid username or password.";
         });
 		
+		
+		socket.on('login already', function(){
+			var x = document.getElementById("message");
+			x.innerHTML = "You are logged in in another tab.";
+        });
+		
         socket.on('login success', function(){
 			var x = document.getElementById("message");
 			x.innerHTML = "Login success! Start chatting!";
@@ -112,6 +152,49 @@
         socket.on('chat message', function(msg){
 			$('#messages').append($('<li>').html(msg));
 			window.scrollTo(0, document.body.scrollHeight);
+        });
+		
+		
+        socket.on('recipient added', function(msg){
+			var x = document.getElementById("message");
+			x.innerHTML = "Recipient added!";
+			
+			$('#recipients').empty();
+			for(i = 0; i < recipientList.length; i++)
+			{
+				if (recipientList[i] != msg)
+				{
+					$('#recipients').append($('<li>').html(recipientList[i]));
+				}
+				else
+				{
+					recipientList.splice(i, 1);
+					i--;
+				}
+			}
+			
+			recipientList.push(msg);
+			$('#recipients').append($('<li>').html(msg));
+        });
+		
+		
+        socket.on('recipient dropped', function(msg){
+			var x = document.getElementById("message");
+			x.innerHTML = "Recipient dropped!";
+			
+			$('#recipients').empty();
+			for(i = 0; i < recipientList.length; i++)
+			{
+				if (recipientList[i] != msg)
+				{
+					$('#recipients').append($('<li>').html(recipientList[i]));
+				}
+				else
+				{
+					recipientList.splice(i, 1);
+					i--;
+				}
+			}
         });
 		
 		socket.on('is_online', function(loginName) {

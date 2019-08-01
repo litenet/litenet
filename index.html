@@ -43,18 +43,15 @@
 			<input id="m" autocomplete="off" /><button>Send</button>
 		</form>
 		
-		
 		<ul id="recipients"></ul>
 		
 		<form id="addrecipient" action="">
 			<input id="addR" autocomplete="off" /><button>Add Recipient</button>
 		</form>
 		
-		
 		<form id="droprecipient" action="">
 			<input id="dropR" autocomplete="off" /><button>Drop Recipient</button>
 		</form>
-
 	</div>
 	
 	
@@ -68,30 +65,6 @@
 		var recipientList = [];
       
         var socket = io();
-		
-        $('#chatbox').submit(function(e){
-			e.preventDefault(); // prevents page reloading
-			socket.emit('chat message', $('#m').val());
-			$('#m').val('');
-			return false;
-        });
-		
-        $('#addrecipient').submit(function(e){
-			e.preventDefault(); // prevents page reloading
-			socket.emit('add recipient', $('#addR').val());
-			$('#addR').val('');
-			return false;
-        });
-		
-		
-		
-        $('#droprecipient').submit(function(e){
-			e.preventDefault(); // prevents page reloading
-			socket.emit('drop recipient', $('#dropR').val());
-			$('#dropR').val('');
-			return false;
-        });
-		
 		
         $('#register').submit(function(e){
 			e.preventDefault(); // prevents page reloading
@@ -111,11 +84,35 @@
 			return false;
         });
 		
+        $('#chatbox').submit(function(e){
+			e.preventDefault(); // prevents page reloading
+			socket.emit('chat message', $('#m').val());
+			$('#m').val('');
+			return false;
+        });
+		
+        $('#addrecipient').submit(function(e){
+			e.preventDefault(); // prevents page reloading
+			socket.emit('add recipient', $('#addR').val());
+			$('#addR').val('');
+			return false;
+        });
+		
+        $('#droprecipient').submit(function(e){
+			e.preventDefault(); // prevents page reloading
+			socket.emit('drop recipient', $('#dropR').val());
+			$('#dropR').val('');
+			return false;
+        });
+		
+		
+		
+		
+		
         socket.on('registration fail', function(){
 			var x = document.getElementById("message");
 			x.innerHTML = "Username taken; choose another.";
         });
-		
 		
         socket.on('short reg name', function(){
 			var x = document.getElementById("message");
@@ -131,7 +128,6 @@
 			var x = document.getElementById("message");
 			x.innerHTML = "Invalid username or password.";
         });
-		
 		
 		socket.on('login already', function(){
 			var x = document.getElementById("message");
@@ -154,18 +150,16 @@
 			window.scrollTo(0, document.body.scrollHeight);
         });
 		
-		
         socket.on('recipient added', function(msg){
 			var x = document.getElementById("message");
 			x.innerHTML = "Recipient added!";
 			
+			// First clear the list and remove the recipient if they're already there
 			$('#recipients').empty();
 			for(i = 0; i < recipientList.length; i++)
 			{
 				if (recipientList[i] != msg)
-				{
 					$('#recipients').append($('<li>').html(recipientList[i]));
-				}
 				else
 				{
 					recipientList.splice(i, 1);
@@ -173,6 +167,7 @@
 				}
 			}
 			
+			// Add the new recipient
 			recipientList.push(msg);
 			$('#recipients').append($('<li>').html(msg));
         });
@@ -186,9 +181,7 @@
 			for(i = 0; i < recipientList.length; i++)
 			{
 				if (recipientList[i] != msg)
-				{
 					$('#recipients').append($('<li>').html(recipientList[i]));
-				}
 				else
 				{
 					recipientList.splice(i, 1);

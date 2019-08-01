@@ -7,7 +7,7 @@
   
   <body>
   
-	<strong><span id="message">Login or register to open the chatroom.</span></strong>
+	<strong><span id="message">First time users need to register a username first. Then log in below.</span></strong>
   
 	<div id="register">  
 		<h2> Register: </h2>
@@ -26,8 +26,10 @@
 	
     <div id="onlinepanel">
 		<h2> Online: </h2>
-		<ul id="chatlist"></ul>
-		<br><hr>
+		<ul id="onlinelist"></ul>
+		<form><button>Log Out</button></form>
+		
+		<br><br><hr>
 	</div>
   
     <div id="login">
@@ -73,7 +75,7 @@
 		var x = document.getElementById("onlinepanel");
 		x.style.display = "none";
 		var recipientList = [];
-		var chatList = [];
+		var onlineList = [];
       
         var socket = io();
 		
@@ -92,6 +94,31 @@
 			$('#loginName').val('');
 			var x = document.getElementById("message");
 			x.innerHTML = "Logging in...";
+			return false;
+        });
+		
+        $('#onlinepanel').submit(function(e){
+			e.preventDefault(); // prevents page reloading
+			socket.emit('logout');
+			
+			var x = document.getElementById("login");
+			x.style.display = "inline";
+			var x = document.getElementById("register");
+			x.style.display = "inline";
+			
+			var x = document.getElementById("onlinepanel");
+			x.style.display = "none";
+			var x = document.getElementById("chatInterface");
+			x.style.display = "none";
+			
+			recipientList = [];
+			onlineList = [];
+			$('#onlinelist').empty();
+			$('#recipients').empty();
+			$('#messages').empty();
+			
+			var x = document.getElementById("message");
+			x.innerHTML = "Logged out.";
 			return false;
         });
 		
@@ -163,8 +190,8 @@
 			
 			for(i = 0; i < nameList.length; i++)
 			{
-				$('#chatlist').append($('<li>').html(nameList[i]));
-				chatList.push(nameList[i]);
+				$('#onlinelist').append($('<li>').html(nameList[i]));
+				onlineList.push(nameList[i]);
 			}
         });
 		
@@ -196,10 +223,7 @@
         });
 		
 		
-        socket.on('recipient dropped', function(msg){
-			var x = document.getElementById("message");
-			x.innerHTML = "Recipient dropped!";
-			
+        socket.on('recipient dropped', function(msg){			
 			$('#recipients').empty();
 			for(i = 0; i < recipientList.length; i++)
 			{
@@ -207,6 +231,8 @@
 					$('#recipients').append($('<li>').html(recipientList[i]));
 				else
 				{
+					var x = document.getElementById("message");
+					x.innerHTML = "Recipient dropped!";
 					recipientList.splice(i, 1);
 					i--;
 				}
@@ -215,21 +241,23 @@
 		
 		socket.on('is_online', function(loginName) {
 			$('#messages').append($('<li>').html('<i>' + loginName + ' logged on.</i>'));
-			chatList.push(loginName);
-			$('#chatlist').append($('<li>').html(loginName));
+			window.scrollTo(0, document.body.scrollHeight);
+			onlineList.push(loginName);
+			$('#onlinelist').append($('<li>').html(loginName));
         });
 		
 		
 		socket.on('is_offline', function(loginName) {
-			$('#messages').append($('<li>').html('<i>' + loginName + ' logged off.</i>'));
-			$('#chatlist').empty();
-			for(i = 0; i < chatList.length; i++)
+			$('#messages').append($('<li>').html('<i>' + loginName + ' logged off.</i>'));			
+			window.scrollTo(0, document.body.scrollHeight);
+			$('#onlinelist').empty();
+			for(i = 0; i < onlineList.length; i++)
 			{
-				if (chatList[i] != loginName)
-					$('#chatlist').append($('<li>').html(chatList[i]));
+				if (onlineList[i] != loginName)
+					$('#onlinelist').append($('<li>').html(onlineList[i]));
 				else
 				{
-					chatList.splice(i, 1);
+					onlineList.splice(i, 1);
 					i--;
 				}
 			}

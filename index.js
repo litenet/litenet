@@ -77,10 +77,38 @@ io.on('connection', function(socket){
 			});
 		});
 	});
+	
+	
+	socket.on('logout', function(){
+		socket.leave('logged in');		
+		socket.broadcast.to('logged in').emit('is_offline', socket.username);
+		io.to('logged in').emit('recipient dropped', socket.username);
+		
+		for (x in io.sockets.sockets)
+		{
+			if (x != socket.id)
+			{
+				io.sockets.connected[x].leave(socket.id);
+				io.sockets.connected[socket.id].leave(x);
+			}
+		}
+		
+		for(i = 0; i < nameList.length; i++)
+		{
+			if (nameList[i] == socket.username)
+			{
+				nameList.splice(i, 1);
+				i--;
+			}
+		}
+		socket.username = '';
+	});
+  
   
 	socket.on('chat message', function(msg){
 		io.to(socket.id).emit('chat message', "<b>" + socket.username + "</b>" + ': ' + msg);
 	});
+	
 	
 	socket.on('add recipient', function(candidate){
 		for (x in io.sockets.sockets)
@@ -93,6 +121,7 @@ io.on('connection', function(socket){
 		}
 	});
 	
+	
 	socket.on('drop recipient', function(candidate){
 		for (x in io.sockets.sockets)
 		{
@@ -103,6 +132,7 @@ io.on('connection', function(socket){
 			}
 		}
 	});
+	
 	
 	socket.on('disconnect', function(){
 		if (socket.username != '')
@@ -119,9 +149,9 @@ io.on('connection', function(socket){
 				}
 			}
 		}
-		
 	});
 });
+
 
 http.listen(port, function(){
 	console.log('listening on *:' + port);

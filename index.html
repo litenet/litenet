@@ -202,7 +202,10 @@
 			
 			var currentState = false;
 			if (!document.hasFocus())
+			{			
+				clearInterval(timer);
 				timer = setInterval(startAnimation, 1000);
+			}
 				
 			// animate between the original and the new title
 			function startAnimation() {
@@ -234,7 +237,6 @@
 			recipientList.push(msg);
 			$('#recipients').append($('<li>').html(msg));
         });
-		
 		
         socket.on('recipient dropped', function(msg){			
 			$('#recipients').empty();
@@ -275,8 +277,6 @@
 				}
 			}
         });
-		
-		
 		
 		
 		// Change page title back on focus

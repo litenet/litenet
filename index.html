@@ -2,7 +2,7 @@
 <html>
 
   <head>
-	<title>Socket.IO chat</title>
+	<title>Chat Code</title>
   </head>
   
   <body>
@@ -76,8 +76,10 @@
 		x.style.display = "none";
 		var recipientList = [];
 		var onlineList = [];
+		origTitle = document.title;  // save original title, to allow animation
       
         var socket = io();
+		var timer;
 		
         $('#register').submit(function(e){
 			e.preventDefault(); // prevents page reloading
@@ -195,8 +197,19 @@
 			}
         });
 		
-        socket.on('chat message', function(msg){
-			$('#messages').append($('<li>').html(msg));
+        socket.on('chat message', function(data){
+			$('#messages').append($('<li>').html("<b>" + data.name + "</b>" + ': ' + data.msg));
+			
+			var currentState = false;
+			if (!document.hasFocus())
+				timer = setInterval(startAnimation, 1000);
+				
+			// animate between the original and the new title
+			function startAnimation() {
+				document.title = currentState ? origTitle : (data.name + " messaged - " + origTitle);
+				currentState = !currentState;
+			}
+			
 			window.scrollTo(0, document.body.scrollHeight);
         });
 		
@@ -262,6 +275,15 @@
 				}
 			}
         });
+		
+		
+		
+		
+		// Change page title back on focus
+		$(window).focus(function() {
+			clearInterval(timer);
+			document.title = origTitle; // restore original title
+		});
 		
     </script>
   </body>

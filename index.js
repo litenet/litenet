@@ -106,7 +106,7 @@ io.on('connection', function(socket){
   
   
 	socket.on('chat message', function(msg){
-		io.to(socket.id).emit('chat message', "<b>" + socket.username + "</b>" + ': ' + msg);
+		io.to(socket.id).emit('chat message', { name:socket.username, msg:msg });
 	});
 	
 	

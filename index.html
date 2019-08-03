@@ -69,6 +69,7 @@
 	
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="https://unpkg.com/moment"></script>
     <script>
 		var x = document.getElementById("chatInterface");
 		x.style.display = "none";
@@ -175,7 +176,7 @@
         });
 		
         socket.on('login success', function(nameList){		
-			$('#messages').append($('<li>').html('<i>' + nameList[nameList.length - 1] + ' (you) logged on.</i>'));
+			$('#messages').append($('<li>').html('<i>' + nameList[nameList.length - 1] + ' (you) logged on at ' + moment().format('M/DD/YYYY h:mm:ss A') + '.</i>'));
 			
 			var x = document.getElementById("message");
 			x.innerHTML = "Login success! Start chatting!";
@@ -198,7 +199,7 @@
         });
 		
         socket.on('chat message', function(data){
-			$('#messages').append($('<li>').html("<b>" + data.name + "</b>" + ': ' + data.msg));
+			$('#messages').append($('<li>').html("<b>" + '(' + moment().format('M/DD/YYYY h:mm:ss A') + ") " + data.name + "</b>" + ': ' + data.msg));
 			
 			var currentState = false;
 			if (!document.hasFocus())
@@ -255,7 +256,7 @@
         });
 		
 		socket.on('is_online', function(loginName) {
-			$('#messages').append($('<li>').html('<i>' + loginName + ' logged on.</i>'));
+			$('#messages').append($('<li>').html('<i>' + loginName + ' logged on at ' + moment().format('M/DD/YYYY h:mm:ss A') + '.</i>'));
 			window.scrollTo(0, document.body.scrollHeight);
 			onlineList.push(loginName);
 			$('#onlinelist').append($('<li>').html(loginName));

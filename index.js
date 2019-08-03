@@ -2,6 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
+const moment = require('moment');
 
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb+srv://vbkellis:my1password@firstcluster-5wdsw.mongodb.net/test?retryWrites=true&w=majority";
@@ -47,7 +48,6 @@ io.on('connection', function(socket){
   
   
 	socket.on('login', function(loginData){
-	  
 		MongoClient.connect(url, function(err, db) {
 			if (err) throw err;
 			var dbo = db.db("mydb");
@@ -111,7 +111,7 @@ io.on('connection', function(socket){
 	
 	
 	socket.on('add recipient', function(candidate){
-		for (x in io.sockets.sockets)
+		for (x in io.sockets.adapter.rooms['logged in'].sockets)
 		{
 			if (io.sockets.connected[x].username == candidate && socket.username != candidate)
 			{

@@ -264,7 +264,7 @@
 		
 		
 		socket.on('is_offline', function(loginName) {
-			$('#messages').append($('<li>').html('<i>' + loginName + ' logged off.</i>'));			
+			$('#messages').append($('<li>').html('<i>' + loginName + ' logged off at ' + moment().format('M/DD/YYYY h:mm:ss A') + '.</i>'));		
 			window.scrollTo(0, document.body.scrollHeight);
 			$('#onlinelist').empty();
 			for(i = 0; i < onlineList.length; i++)

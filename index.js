@@ -118,18 +118,20 @@ io.on('connection', function(socket){
 	
 	
 	socket.on('disconnect', function(){	
-		socket.broadcast.to('logged in').emit('is_offline', socket.username);
-		io.to('logged in').emit('recipient dropped', socket.username);
-		
-		for(i = 0; i < nameList.length; i++)
+		if (socket.username != '')
 		{
-			if (nameList[i] == socket.username)
+			io.to('logged in').emit('is_offline', socket.username);
+			io.to('logged in').emit('recipient dropped', socket.username);
+			
+			for(i = 0; i < nameList.length; i++)
 			{
-				nameList.splice(i, 1);
-				i--;
+				if (nameList[i] == socket.username)
+				{
+					nameList.splice(i, 1);
+					i--;
+				}
 			}
 		}
-		socket.username = '';
 	});
 	
 	

@@ -121,15 +121,6 @@ io.on('connection', function(socket){
 		socket.broadcast.to('logged in').emit('is_offline', socket.username);
 		io.to('logged in').emit('recipient dropped', socket.username);
 		
-		for (x in io.sockets.sockets)
-		{
-			if (x != socket.id)
-			{
-				io.sockets.connected[x].leave(socket.id);
-				io.sockets.connected[socket.id].leave(x);
-			}
-		}
-		
 		for(i = 0; i < nameList.length; i++)
 		{
 			if (nameList[i] == socket.username)

@@ -16,6 +16,10 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
 	
 	socket.username = '';
+	socket.emit('newconnection');
+	socket.on('newconnection', function(loginData) {
+		//console.log(loginData.name);
+	});
 		
 	socket.on('register', function(registerData){
 	  
@@ -47,7 +51,7 @@ io.on('connection', function(socket){
 	});
   
   
-	socket.on('login', function(loginData){
+	socket.on('login', function(loginData) {
 		MongoClient.connect(url, function(err, db) {
 			if (err) throw err;
 			var dbo = db.db("mydb");
@@ -80,28 +84,7 @@ io.on('connection', function(socket){
 	
 	
 	socket.on('logout', function(){
-		socket.leave('logged in');		
-		socket.broadcast.to('logged in').emit('is_offline', socket.username);
-		io.to('logged in').emit('recipient dropped', socket.username);
-		
-		for (x in io.sockets.sockets)
-		{
-			if (x != socket.id)
-			{
-				io.sockets.connected[x].leave(socket.id);
-				io.sockets.connected[socket.id].leave(x);
-			}
-		}
-		
-		for(i = 0; i < nameList.length; i++)
-		{
-			if (nameList[i] == socket.username)
-			{
-				nameList.splice(i, 1);
-				i--;
-			}
-		}
-		socket.username = '';
+		logout();
 	});
   
   
@@ -135,21 +118,34 @@ io.on('connection', function(socket){
 	
 	
 	socket.on('disconnect', function(){
-		if (socket.username != '')
+		logout();
+	});
+	
+	
+	function logout() {
+		socket.leave('logged in');		
+		socket.broadcast.to('logged in').emit('is_offline', socket.username);
+		io.to('logged in').emit('recipient dropped', socket.username);
+		
+		for (x in io.sockets.sockets)
 		{
-			io.to('logged in').emit('is_offline', socket.username);
-			io.to('logged in').emit('recipient dropped', socket.username);
-			
-			for(i = 0; i < nameList.length; i++)
+			if (x != socket.id)
 			{
-				if (nameList[i] == socket.username)
-				{
-					nameList.splice(i, 1);
-					i--;
-				}
+				io.sockets.connected[x].leave(socket.id);
+				io.sockets.connected[socket.id].leave(x);
 			}
 		}
-	});
+		
+		for(i = 0; i < nameList.length; i++)
+		{
+			if (nameList[i] == socket.username)
+			{
+				nameList.splice(i, 1);
+				i--;
+			}
+		}
+		socket.username = '';
+	}
 });
 
 

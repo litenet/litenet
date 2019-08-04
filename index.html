@@ -36,10 +36,10 @@
 		<h2> Login: </h2>  
 		<form action=".">
 			Name:<br>
-			<input id="loginName" "type="text" name="name" value="Alice">
+			<input id="loginName" "type="text" name="name">
 			<br>
 			Password:<br>
-			<input id="loginPassword" type="text" name="password" value="alicepass">
+			<input id="loginPassword" type="text" name="password">
 			<br><br>
 			<input type="submit" value="Submit">
 		</form> 
@@ -71,6 +71,9 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 	<script src="https://unpkg.com/moment"></script>
     <script>
+	
+		$('#loginName').val(getCookie("username"));
+		$('#loginPassword').val(getCookie("password"));
 		var x = document.getElementById("chatInterface");
 		x.style.display = "none";
 		var x = document.getElementById("onlinepanel");
@@ -182,10 +185,6 @@
 		
 			setCookie("username", myusername, 1);
 			setCookie("password", mypassword, 1);
-			
-			
-			$('#loginName').val('');
-			$('#loginPassword').val('');
 			
 			$('#messages').append($('<li>').html('<i>' + nameList[nameList.length - 1] + ' (you) logged on at ' + moment().format('M/DD/YYYY h:mm:ss A') + '.</i>'));
 			

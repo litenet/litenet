@@ -7,9 +7,9 @@
   
 <body onload="checkCookie()">
   
-	<strong><span id="message">First time users need to register a username first. Then log in below.</span></strong>
+	<strong><span id="message">Loading...</span></strong>
   
-	<div id="register">  
+	<div id="register" style="display: none">  
 		<h2> Register: </h2>
 		<form action=".">
 			Name:<br>
@@ -24,7 +24,7 @@
 	</div>
 	
 	
-    <div id="onlinepanel">
+    <div id="onlinepanel" style="display: none">
 		<h2> Online: </h2>
 		<ul id="onlinelist"></ul>
 		<form><button>Log Out</button></form>
@@ -32,7 +32,7 @@
 		<br><br><hr>
 	</div>
   
-    <div id="login">
+    <div id="login" style="display: none">
 		<h2> Login: </h2>  
 		<form action=".">
 			Name:<br>
@@ -45,7 +45,7 @@
 		</form> 
 	</div>
   
-	<div id="chatInterface">
+	<div id="chatInterface" style="display: none">
 		<ul id="messages"></ul>
 		
 		<form id="chatbox" action="">
@@ -77,6 +77,10 @@
 		var x = document.getElementById("chatInterface");
 		x.style.display = "none";
 		var x = document.getElementById("onlinepanel");
+		x.style.display = "none";
+		var x = document.getElementById("register");
+		x.style.display = "none";
+		var x = document.getElementById("login");
 		x.style.display = "none";
 		var recipientList = [];
 		var onlineList = [];
@@ -171,6 +175,10 @@
 		socket.on('login fail', function(nameList){
 			var x = document.getElementById("message");
 			x.innerHTML = "Invalid username or password.";
+			var x = document.getElementById("register");
+			x.style.display = "inline";
+			var x = document.getElementById("login");
+			x.style.display = "inline";
         });
 		
 		socket.on('login already', function(){
@@ -317,6 +325,15 @@
 		  var password=getCookie("password");
 		  if (user != "")
 			socket.emit('login', { name: user, password: password, login: "false" });
+		else
+		{			
+			var x = document.getElementById("message");
+			x.innerHTML = "First time users need to register a username. Then log in below.";
+			var x = document.getElementById("register");
+			x.style.display = "inline";
+			var x = document.getElementById("login");
+			x.style.display = "inline";
+		}
         });
 		
 		

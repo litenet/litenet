@@ -298,24 +298,21 @@
 		
 		
 		
-		socket.on('newconnection', function() {			
-			var x = document.getElementById("login");
-			x.style.display = "inline";
-			var x = document.getElementById("register");
-			x.style.display = "inline";
-			
-			var x = document.getElementById("onlinepanel");
-			x.style.display = "none";
-			var x = document.getElementById("chatInterface");
-			x.style.display = "none";
+		
+		socket.on('disconnect', function(){
+			$('#onlinelist').empty();
+			$('#recipients').empty();
 			
 			recipientList = [];
 			onlineList = [];
-			$('#onlinelist').empty();
-			$('#recipients').empty();
-			$('#messages').empty();
 			
+			$('#messages').append($('<li>').html('<i>You disconnected at ' + moment().format('M/DD/YYYY h:mm:ss A') + '.</i>'));
 			
+		});
+		
+		
+		socket.on('newconnection', function() {	
+		
 		  var user=getCookie("username");
 		  var password=getCookie("password");
 		  if (user != "")

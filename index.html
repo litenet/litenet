@@ -5,7 +5,7 @@
 	<title>Chat Code</title>
   </head>
   
-<body onload="checkCookie()">
+<body>
   
 	<strong><span id="message">Loading...</span></strong>
   
@@ -22,7 +22,6 @@
 		</form> 
 		<br><hr>
 	</div>
-	
 	
     <div id="onlinepanel" style="display: none">
 		<h2> Online: </h2>
@@ -122,8 +121,6 @@
 			$('#onlinelist').empty();
 			$('#recipients').empty();
 			$('#messages').empty();
-			document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-			document.cookie = "password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
 			
 			var x = document.getElementById("message");
 			x.innerHTML = "Logged out.";
@@ -298,13 +295,6 @@
         });
 		
 		
-		// Change page title back on focus
-		$(window).focus(function() {
-			clearInterval(timer);
-			document.title = origTitle; // restore original title
-		});
-		
-		
 		socket.on('disconnect', function(){
 			$('#onlinelist').empty();
 			$('#recipients').empty();
@@ -324,6 +314,14 @@
 			var x = document.getElementById("login");
 			x.style.display = "inline";
         });
+		
+		
+		
+		// Change page title back on focus
+		$(window).focus(function() {
+			clearInterval(timer);
+			document.title = origTitle; // restore original title
+		});
 		
     </script>
 	

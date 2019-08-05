@@ -306,7 +306,8 @@
 		});
 		
 		
-		socket.on('newconnection', function() {	
+		socket.on('connect', function() {	
+			socket.sendBuffer = [];
 			var x = document.getElementById("message");
 			x.innerHTML = "First time users need to register a username. Then log in below.";
 			var x = document.getElementById("register");

@@ -160,15 +160,18 @@
 			x.innerHTML = "Username taken; choose another.";
         });
 		
+		
         socket.on('short reg name', function(){
 			var x = document.getElementById("message");
 			x.innerHTML = "Username must be at least 3 characters.";
         });
 		
+		
         socket.on('registration success', function(){
 			var x = document.getElementById("message");
 			x.innerHTML = "User added!";
         });
+		
 		
 		socket.on('login fail', function(nameList){
 			var x = document.getElementById("message");
@@ -179,10 +182,12 @@
 			x.style.display = "inline";
         });
 		
+		
 		socket.on('login already', function(){
 			var x = document.getElementById("message");
 			x.innerHTML = "You are logged in in another tab.";
         });
+		
 		
         socket.on('login success', function(nameList){
 			$('#messages').append($('<li>').html('<i>' + nameList[nameList.length - 1] + ' (you) logged on at ' + moment().format('M/DD/YYYY h:mm:ss A') + '.</i>'));
@@ -207,6 +212,7 @@
 			}
         });
 		
+		
         socket.on('chat message', function(data){
 			$('#messages').append($('<li>').html("<b>" + '(' + moment().format('M/DD/YYYY h:mm:ss A') + ") " + data.name + "</b>" + ': ' + data.msg));
 			
@@ -225,6 +231,7 @@
 			
 			window.scrollTo(0, document.body.scrollHeight);
         });
+		
 		
         socket.on('recipient added', function(msg){
 			var x = document.getElementById("message");
@@ -248,6 +255,7 @@
 			$('#recipients').append($('<li>').html(msg));
         });
 		
+		
         socket.on('recipient dropped', function(msg){			
 			$('#recipients').empty();
 			for(i = 0; i < recipientList.length; i++)
@@ -263,6 +271,7 @@
 				}
 			}
         });
+		
 		
 		socket.on('is_online', function(loginName) {
 			$('#messages').append($('<li>').html('<i>' + loginName + ' logged on at ' + moment().format('M/DD/YYYY h:mm:ss A') + '.</i>'));
@@ -294,8 +303,6 @@
 			clearInterval(timer);
 			document.title = origTitle; // restore original title
 		});
-		
-		
 		
 		
 		socket.on('disconnect', function(){

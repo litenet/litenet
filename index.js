@@ -17,9 +17,6 @@ io.on('connection', function(socket){
 	
 	socket.username = '';
 	socket.emit('newconnection');
-	socket.on('newconnection', function(loginData) {
-		//console.log(loginData.name);
-	});
 		
 	socket.on('register', function(registerData){
 	  
